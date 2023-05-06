@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Project Armageddon</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/phaser/3.60.0/phaser.js"
+    integrity="sha512-H05oT7BAjM9Ai1IaFX9zr61NtE2e1P0MkTz3AZXBnseaJSAOt2FGMFJ+vVGutaJxEGA1jxUiYsTBYQNE08/Erw=="
+    crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script>
+    class Intro extends Phaser.Scene {
+      constructor() {
+        super('intro');
+      }
+      create() {
+        this.add.text(10, 10, "Click to begin.");
+        this.input.on('pointerdown', () => this.scene.start('warning'));
+      }
+    }
+
+    class Warning extends Phaser.Scene {
+      constructor() {
+        super('warning');
+      }
+      create() {
+        this.add.text(110, 120, "Photosensitive Warning: Read Before Playing");
+        let box = this.add.text(10, 220,
+          `Certain conditions may induce previously undetected epileptic
+symptoms even in persons who have no history of prior seizures
+or epilepsy. If you, or anyone in your family, have an epileptic
+condition, consult your physician prior to playing.`
+        );
+
+        this.time.delayedCall(5000, () => {
+          this.scene.start('opening');
+        })
+
+        this.input.on('pointerdown', () => this.scene.start('opening'));
+      }
+    }
+
+    class Opening extends Phaser.Scene {
+      constructor() {
+        super('opening');
+      }
+      preload() {
+        this.load.path = './assets/';
+        this.load.image('player', 'player.png');
+        this.load.audio('walk', ['walk.mp3']);
+      }
+      create() {
+        this.player = this.add.sprite(0, 350, 'player');
+        this.player.setScale(.5);
+        this.sound.add("walk", { loop: false }).play();
+      }
+      update() {
+        this.player.x += 1.2;
+
+        if(this.player.x > 700) {
+          this.scene.start('op2');
+        }
+      }
+    }
+
+    class Op2 extends Phaser.Scene {
+      constructor() {
+        super('op2');
+      }
+      preload() {
+        this.load.path = './assets/';
+        this.load.image('player_s', 'player_s.png');
+        this.load.image('background', 'background.png');
+        this.load.image('bomb', 'bomb.png');
+      }
+      create() {
+        this.background = this.add.sprite(320, 240, 'background');
+        this.player_s = this.add.sprite(90, 400, 'player_s');
+        this.player_s.setScale(.5);
+        this.bomb = this.add.sprite(500, -50, 'bomb');
+        this.dialogue = this.add.text(400, 220,`If you are\nreading this\nletter...`);
+      }
+      update() {
+        this.time.delayedCall(4000, () => {
+          this.dialogue.setText('I\'m Sorry, Son');
+        })
+        this.time.delayedCall(8000, () => {
+          this.bomb.y += 0.5;
+        })
+        if (this.bomb.y > 360) {
+          this.scene.start('start', { fadeIn: true});
+        }
+      }
+    }
+
+    class Start extends Phaser.Scene {
+      constructor() {
+        super('start');
+      }
+      preload() {
+        this.load.path = './assets/';
+        this.load.image('logo', 'logo.png');
+        this.load.audio('flash', ['flash.mp3']);
+      }
+      create() {
+        this.logo = this.add.sprite(320, 240, 'logo');
+        this.logo.setScale(0.2);
+        this.cameras.main.fadeIn(2000, 255, 255, 255);
+        this.sound.add("flash", { loop: false }).play();
+      }
+      update() {
+        
+      }
+    }
+
+    new Phaser.Game({
+      width: 640,
+      height: 480,
+      scene: [Intro, Warning, Opening, Op2, Start],
+    });
+  </script>
+</head>
+
+<body>
+
+</body>
+
+</html>
